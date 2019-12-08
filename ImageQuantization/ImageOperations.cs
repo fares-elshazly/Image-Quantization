@@ -28,6 +28,39 @@ namespace ImageQuantization
     /// </summary>
     public class ImageOperations
     {
+        public int FastPower(int Base, int Power)
+        {
+
+            int Result = FastPower(Base, Power / 2);
+            if (Power == 1)
+                return Base;
+            if (Power == 0)
+                return 1;
+            if (Power % 2 == 0)
+                return FastPower(Base, Power / 2) * Result;
+            else
+                return Base * Result * FastPower(Base, Power / 2);
+
+        }
+        public double SquareRoot(double Start, double End, double Number)
+        {
+            Start = 1;
+            End = Number;
+            if (Start > End)
+                return -1;
+            double Mid = (Start + End) / 2;
+            if (Mid * Mid == Number || (Math.Abs(Mid * Mid - Number) < .00000001))
+            {
+                int Res = (int)Mid;
+                if (Mid * Mid == Number)
+                    return Res;
+                return Mid;
+            }
+            if (Mid * Mid > Number)
+                return SquareRoot(Start, Mid, Number);
+            else
+                return SquareRoot(Mid, End, Number);
+        }
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
         /// </summary>
@@ -92,7 +125,22 @@ namespace ImageQuantization
 
             return Buffer;
         }
-        
+        public int Find_DistinctColors(string imagePath)
+        {
+
+            RGBPixel[,] Colors = OpenImage(imagePath);
+            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
+
+            for (int i = 0; i < GetHeight(Colors); i++)
+            {
+                for (int j = 0; j < GetWidth(Colors); j++)
+                {
+                    Distincit_Colors.Add(Colors[i, j]);
+                }
+            }
+
+            return Distincit_Colors.Count;
+        }
         /// <summary>
         /// Get the height of the image 
         /// </summary>
