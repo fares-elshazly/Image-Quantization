@@ -27,8 +27,9 @@ namespace ImageQuantization
                 string OpenedFilePath = openFileDialog1.FileName;
                 ImageMatrix = ImageOperations.OpenImage(OpenedFilePath);
                 ImageOperations.DisplayImage(ImageMatrix, pictureBox1);
-                int result = img.Find_DistinctColors(openFileDialog1.FileName);
-                MessageBox.Show(result.ToString());
+                List<RGBPixel> result = img.Find_DistinctColors(openFileDialog1.FileName);
+              
+                MessageBox.Show(result.Count.ToString());
             }
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
             txtHeight.Text = ImageOperations.GetHeight(ImageMatrix).ToString();

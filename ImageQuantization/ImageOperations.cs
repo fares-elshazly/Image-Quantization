@@ -125,22 +125,27 @@ namespace ImageQuantization
 
             return Buffer;
         }
-        public int Find_DistinctColors(string imagePath)
+        public List<RGBPixel> Find_DistinctColors(string imagePath)
         {
 
             RGBPixel[,] Colors = OpenImage(imagePath);
+
             HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
 
             for (int i = 0; i < GetHeight(Colors); i++)
             {
                 for (int j = 0; j < GetWidth(Colors); j++)
                 {
+
                     Distincit_Colors.Add(Colors[i, j]);
+
                 }
             }
+            List<RGBPixel> DistinctColors = new List<RGBPixel>(Distincit_Colors);
 
-            return Distincit_Colors.Count;
+            return DistinctColors;
         }
+
         /// <summary>
         /// Get the height of the image 
         /// </summary>
