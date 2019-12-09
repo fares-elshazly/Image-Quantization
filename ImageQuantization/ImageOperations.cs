@@ -28,6 +28,36 @@ namespace ImageQuantization
     /// </summary>
     public class ImageOperations
     {
+        public int fastPower(int Base, int Power)
+        {
+
+            int Result = fastPower(Base, Power / 2);
+            if (Power == 1)
+                return Base;
+            if (Power == 0)
+                return 1;
+            if (Power % 2 == 0)
+                return fastPower(Base, Power / 2) * Result;
+            else
+                return Base * Result * fastPower(Base, Power / 2);
+
+        }
+        public static double Sqrt(double x)
+        {
+            // Base cases 
+            if (x == 0 || x == 1)
+                return x;
+
+            // Staring from 1, try all numbers until 
+            // i*i is greater than or equal to x. 
+            double i = 1, result = 1;
+            while (result <= x)
+            {
+                i++;
+                result = i * i;
+            }
+            return i - 1;
+        }
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
         /// </summary>
@@ -91,6 +121,63 @@ namespace ImageQuantization
             }
 
             return Buffer;
+        }
+
+
+         //return number of distinct_colors
+        public int Find_DistinctColors_count(string imagePath)
+        {
+
+            RGBPixel[,] Colors = OpenImage(imagePath);
+            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
+           
+            for (int i = 0; i < Colors.GetLength(0); i++)
+            {
+                for (int j = 0; j < Colors.GetLength(1); j++)
+                {
+                    if(!Distincit_Colors.Contains(Colors[i,j]))
+                        Distincit_Colors.Add(Colors[i , j]);
+                }
+            }
+
+            return Distincit_Colors.Count;
+        }
+        //return distinct colors in list 
+        public List<RGBPixel> Find_DistinctColors(string imagePath)
+        {
+
+            RGBPixel[,] Colors = OpenImage(imagePath);
+            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
+
+            for (int i = 0; i < Colors.GetLength(0); i++)
+            {
+                for (int j = 0; j < Colors.GetLength(1); j++)
+                {
+                    if (!Distincit_Colors.Contains(Colors[i, j]))
+                        Distincit_Colors.Add(Colors[i, j]);
+                }
+            }
+            List<RGBPixel> weights = new List<RGBPixel>(Distincit_Colors);
+            return weights;
+
+        }
+        // get list of distincit return weights in list 
+        public List<double> get_weight(List<RGBPixel> Distincit_Colors)
+        {
+            List<double> weights = new List<double>();
+
+            for (int i=0; i < Distincit_Colors.Count; i++)
+            {
+
+                weights[i] = Sqrt( fastPower( ((Distincit_Colors[i].red) - (Distincit_Colors[i + 1].red)) , 2 )
+
+                             + fastPower( ((Distincit_Colors[i].green) - (Distincit_Colors[i + 1].green)) ,2 )
+
+                             + fastPower( ((Distincit_Colors[i].blue) - (Distincit_Colors[i + 1].blue)) , 2 ) );
+
+            }
+
+            return weights;
         }
         
         /// <summary>
