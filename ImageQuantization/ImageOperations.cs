@@ -4,12 +4,16 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
+
+
 ///Algorithms Project
 ///Intelligent Scissors
 ///
 
 namespace ImageQuantization
 {
+
+
     /// <summary>
     /// Holds the pixel color in 3 byte values: red, green and blue
     /// </summary>
@@ -21,43 +25,19 @@ namespace ImageQuantization
     {
         public double red, green, blue;
     }
-    
-  
+
+
     /// <summary>
     /// Library of static functions that deal with images
     /// </summary>
     public class ImageOperations
     {
-        public int fastPower(int Base, int Power)
-        {
+        public Utilities Object = new Utilities();
+        public List<RGBPixel> DistinctColors = new List<RGBPixel>();
+        public Double[,] Clusters_Graph;
+        public int Vertices;
+        public int NumOfEdges;
 
-            int Result = fastPower(Base, Power / 2);
-            if (Power == 1)
-                return Base;
-            if (Power == 0)
-                return 1;
-            if (Power % 2 == 0)
-                return fastPower(Base, Power / 2) * Result;
-            else
-                return Base * Result * fastPower(Base, Power / 2);
-
-        }
-        public static double Sqrt(double x)
-        {
-            // Base cases 
-            if (x == 0 || x == 1)
-                return x;
-
-            // Staring from 1, try all numbers until 
-            // i*i is greater than or equal to x. 
-            double i = 1, result = 1;
-            while (result <= x)
-            {
-                i++;
-                result = i * i;
-            }
-            return i - 1;
-        }
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
         /// </summary>
@@ -68,7 +48,6 @@ namespace ImageQuantization
             Bitmap original_bm = new Bitmap(ImagePath);
             int Height = original_bm.Height;
             int Width = original_bm.Width;
-
             RGBPixel[,] Buffer = new RGBPixel[Height, Width];
 
             unsafe
@@ -123,68 +102,79 @@ namespace ImageQuantization
             return Buffer;
         }
 
-
-         //return number of distinct_colors
-        public int Find_DistinctColors_count(string imagePath)
+        public List<RGBPixel> Find_DistinctColors(String imagePath)
         {
 
             RGBPixel[,] Colors = OpenImage(imagePath);
-            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
-           
-            for (int i = 0; i < Colors.GetLength(0); i++)
-            {
-                for (int j = 0; j < Colors.GetLength(1); j++)
-                {
-                    if(!Distincit_Colors.Contains(Colors[i,j]))
-                        Distincit_Colors.Add(Colors[i , j]);
-                }
-            }
 
-            return Distincit_Colors.Count;
-        }
-        //return distinct colors in list 
-        public List<RGBPixel> Find_DistinctColors(string imagePath)
-        {
-
-            RGBPixel[,] Colors = OpenImage(imagePath);
             HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
 
             for (int i = 0; i < Colors.GetLength(0); i++)
             {
                 for (int j = 0; j < Colors.GetLength(1); j++)
                 {
-                    if (!Distincit_Colors.Contains(Colors[i, j]))
-                        Distincit_Colors.Add(Colors[i, j]);
+
+                    Distincit_Colors.Add(Colors[i, j]);
+
                 }
             }
-            List<RGBPixel> weights = new List<RGBPixel>(Distincit_Colors);
-            return weights;
+            DistinctColors = new List<RGBPixel>(Distincit_Colors);
+
+            return DistinctColors;
+        }
+
+        public double GetDistance(RGBPixel Cluster1, RGBPixel Cluster2)
+        {
+            double Result = Math.Pow(Cluster1.red - Cluster2.red, 2) + Math.Pow(Cluster1.green - Cluster2.green, 2) + Math.Pow(Cluster1.blue - Cluster2.blue, 2);
+            return Math.Sqrt(Result);
+
 
         }
-        // get list of distincit return weights in list 
-        public List<double> get_weight(List<RGBPixel> Distincit_Colors)
+
+        public double[,] Build_Graph()
         {
-            List<double> weights = new List<double>();
-
-            for (int i=0; i < Distincit_Colors.Count; i++)
+            Vertices = DistinctColors.Count;
+            double[,] graph = new double[Vertices, Vertices];
+            for (int i = 0; i < Vertices; i++)
             {
+                for (int j = 0; j < Vertices; j++)
+                {
+                    graph[i, j] = GetDistance(DistinctColors[i], DistinctColors[j]);
+                }
+            }
+            return graph;
+        }
 
-                weights[i] = Sqrt( fastPower( ((Distincit_Colors[i].red) - (Distincit_Colors[i + 1].red)) , 2 )
-
-                             + fastPower( ((Distincit_Colors[i].green) - (Distincit_Colors[i + 1].green)) ,2 )
-
-                             + fastPower( ((Distincit_Colors[i].blue) - (Distincit_Colors[i + 1].blue)) , 2 ) );
-
+        public Double MST()
+        {
+            Vertices = DistinctColors.Count;
+            Double[,] Graph = Build_Graph();
+            NumOfEdges = Graph.Length;
+            int index = 0;
+            Graph graph = new Graph(Vertices, NumOfEdges);
+            for (int i = 0; i < Vertices; i++)
+            {
+                for (int j = 0; j < Vertices; j++)
+                {
+                    if (index < NumOfEdges)
+                    {
+                        graph.Edges[index].Source = i;
+                        graph.Edges[index].Destination = j;
+                        graph.Edges[index].Weight = Graph[i, j];
+                        index++;
+                    }
+                }
             }
 
-            return weights;
+            return graph.Kruskal_MST();
+
         }
-        
         /// <summary>
         /// Get the height of the image 
         /// </summary>
         /// <param name="ImageMatrix">2D array that contains the image</param>
         /// <returns>Image Height</returns>
+
         public static int GetHeight(RGBPixel[,] ImageMatrix)
         {
             return ImageMatrix.GetLength(0);
@@ -239,13 +229,13 @@ namespace ImageQuantization
         }
 
 
-       /// <summary>
-       /// Apply Gaussian smoothing filter to enhance the edge detection 
-       /// </summary>
-       /// <param name="ImageMatrix">Colored image matrix</param>
-       /// <param name="filterSize">Gaussian mask size</param>
-       /// <param name="sigma">Gaussian sigma</param>
-       /// <returns>smoothed color image</returns>
+        /// <summary>
+        /// Apply Gaussian smoothing filter to enhance the edge detection 
+        /// </summary>
+        /// <param name="ImageMatrix">Colored image matrix</param>
+        /// <param name="filterSize">Gaussian mask size</param>
+        /// <param name="sigma">Gaussian sigma</param>
+        /// <returns>smoothed color image</returns>
         public static RGBPixel[,] GaussianFilter1D(RGBPixel[,] ImageMatrix, int filterSize, double sigma)
         {
             int Height = GetHeight(ImageMatrix);
@@ -254,7 +244,7 @@ namespace ImageQuantization
             RGBPixelD[,] VerFiltered = new RGBPixelD[Height, Width];
             RGBPixel[,] Filtered = new RGBPixel[Height, Width];
 
-           
+
             // Create Filter in Spatial Domain:
             //=================================
             //make the filter ODD size
