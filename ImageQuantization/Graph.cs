@@ -1,117 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ImageQuantization;
 
 namespace ImageQuantization
 {
-    class Graph
+    public class Graph
     {
+        public int NumOfVertices, NumOfEdges;
+        public Edge[] Edges;
+
         public class Edge
         {
             public int Source, Destination;
-            public Double Weight;
+            public double Weight;
         }
 
-        public class SubSet
+        public Graph(int NumOfVertices, int NumOfEdges)
         {
-            public int Parent, Rank;
-        };
-
-        public int Vertices, Total_Edges;
-        public Edge[] Edges;
-
-        public Graph(int V, int E)
-        {
-            Vertices = V;
-            Total_Edges = E;
-            Edges = new Edge[Total_Edges];
-            for (int i = 0; i < E; ++i)
+            this.NumOfVertices = NumOfVertices;
+            this.NumOfEdges = NumOfEdges;
+            Edges = new Edge[NumOfEdges];
+            for (int i = 0; i < NumOfEdges; ++i)
                 Edges[i] = new Edge();
-
-        }
-        public int Find(SubSet[] SubSets, int i)
-        {
-
-            if (SubSets[i].Parent != i)
-                SubSets[i].Parent = Find(SubSets,
-                                         SubSets[i].Parent);
-
-            return SubSets[i].Parent;
-        }
-        public void Union(SubSet[] SubSets, int x, int y)
-        {
-            int Root_X = Find(SubSets, x);
-            int Root_Y = Find(SubSets, y);
-
-            if (SubSets[Root_X].Rank < SubSets[Root_Y].Rank)
-                SubSets[Root_X].Parent = Root_Y;
-
-            else if (SubSets[Root_X].Rank > SubSets[Root_Y].Rank)
-                SubSets[Root_Y].Parent = Root_X;
-
-
-            else
-            {
-                SubSets[Root_Y].Parent = Root_X;
-                SubSets[Root_X].Rank++;
-            }
         }
 
-
-        public Double Kruskal_MST()
+        public void BuildEdges(List<RGBPixel> DistinctColors)
         {
-            Edge[] New_Edges = new Edge[Vertices];
-            int Edges_index = 0;
-            int i = 0;
-            for (i = 0; i < Vertices; ++i)
-                New_Edges[i] = new Edge();
+            int EdgeIndex = 0;
 
-            Array.Sort(Edges, delegate (Edge Edges1, Edge Edges2)
+            for(int i = 0; i < NumOfVertices; i++)
             {
-                return Edges1.Weight.CompareTo(Edges2.Weight);
-            });
-
-
-            SubSet[] SubSets = new SubSet[Vertices];
-            for (i = 0; i < Vertices; ++i)
-                SubSets[i] = new SubSet();
-
-
-            for (int v = 0; v < Vertices; ++v)
-            {
-                SubSets[v].Parent = v;
-                SubSets[v].Rank = 0;
-            }
-
-            i = 0;
-
-            while (Edges_index < Vertices - 1)
-            {
-                Edge next_Edges = new Edge();
-                next_Edges = Edges[i++];
-
-                int x = Find(SubSets, next_Edges.Source);
-                int y = Find(SubSets, next_Edges.Destination);
-
-                if (x != y)
+                for (int j = 0; j < NumOfVertices; j++)
                 {
-                    New_Edges[Edges_index++] = next_Edges;
-                    Union(SubSets, x, y);
+                    if(i != j)
+                    {
+                        Edges[EdgeIndex].Source = i;
+                        Edges[EdgeIndex].Destination = j;
+                        Edges[EdgeIndex].Weight = MathUtilities.GetDistance(DistinctColors[i], DistinctColors[j]);
+                        EdgeIndex++;
+                    }
                 }
-
             }
-
-            Double Result = 0;
-            for (i = 0; i < Edges_index; ++i)
-            {
-
-                Result += New_Edges[i].Weight;
-
-            }
-            return Result;
-
         }
     }
 }

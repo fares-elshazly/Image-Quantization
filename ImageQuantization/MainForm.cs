@@ -19,7 +19,6 @@ namespace ImageQuantization
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            ImageOperations img = new ImageOperations();
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -27,12 +26,17 @@ namespace ImageQuantization
                 string OpenedFilePath = openFileDialog1.FileName;
                 ImageMatrix = ImageOperations.OpenImage(OpenedFilePath);
                 ImageOperations.DisplayImage(ImageMatrix, pictureBox1);
-                List<RGBPixel> result = img.Find_DistinctColors(openFileDialog1.FileName);
-                MessageBox.Show("Num Of Destinct Colors :" + result.Count.ToString());
 
-                double MST_SUM = img.MST();
-                MessageBox.Show("MST sum :" + MST_SUM.ToString());
+                long timeBefore = Environment.TickCount;
+                List<RGBPixel> DistinctColours = ImageUtilities.FindDistinctColors(openFileDialog1.FileName);
+                Graph Graph = new Graph(DistinctColours.Count, DistinctColours.Count * DistinctColours.Count);
+                Graph.BuildEdges(DistinctColours);
+                double MSTSum = MST.KruskalMST(Graph.Edges, DistinctColours.Count);
+                long timeAfter = Environment.TickCount;
 
+                txtDistinctColours.Text = DistinctColours.Count.ToString();
+                txtMSTSum.Text = MathUtilities.RoundUp(MSTSum, 1).ToString();
+                txtTime.Text = (timeAfter - timeBefore).ToString();
             }
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
             txtHeight.Text = ImageOperations.GetHeight(ImageMatrix).ToString();
