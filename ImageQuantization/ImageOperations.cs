@@ -4,12 +4,16 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
+
+
 ///Algorithms Project
 ///Intelligent Scissors
 ///
 
 namespace ImageQuantization
 {
+
+
     /// <summary>
     /// Holds the pixel color in 3 byte values: red, green and blue
     /// </summary>
@@ -21,13 +25,19 @@ namespace ImageQuantization
     {
         public double red, green, blue;
     }
-    
-  
+
+
     /// <summary>
     /// Library of static functions that deal with images
     /// </summary>
     public class ImageOperations
     {
+        public Utilities Object = new Utilities();
+        public List<RGBPixel> DistinctColors = new List<RGBPixel>();
+        public Double[,] Clusters_Graph;
+        public int Vertices;
+        public int NumOfEdges;
+
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
         /// </summary>
@@ -38,7 +48,6 @@ namespace ImageQuantization
             Bitmap original_bm = new Bitmap(ImagePath);
             int Height = original_bm.Height;
             int Width = original_bm.Width;
-
             RGBPixel[,] Buffer = new RGBPixel[Height, Width];
 
             unsafe
@@ -92,12 +101,80 @@ namespace ImageQuantization
 
             return Buffer;
         }
-        
+
+        public List<RGBPixel> Find_DistinctColors(String imagePath)
+        {
+
+            RGBPixel[,] Colors = OpenImage(imagePath);
+
+            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
+
+            for (int i = 0; i < Colors.GetLength(0); i++)
+            {
+                for (int j = 0; j < Colors.GetLength(1); j++)
+                {
+
+                    Distincit_Colors.Add(Colors[i, j]);
+
+                }
+            }
+            DistinctColors = new List<RGBPixel>(Distincit_Colors);
+
+            return DistinctColors;
+        }
+
+        public double GetDistance(RGBPixel Cluster1, RGBPixel Cluster2)
+        {
+            double Result = Math.Pow(Cluster1.red - Cluster2.red, 2) + Math.Pow(Cluster1.green - Cluster2.green, 2) + Math.Pow(Cluster1.blue - Cluster2.blue, 2);
+            return Math.Sqrt(Result);
+
+
+        }
+
+        public double[,] Build_Graph()
+        {
+            Vertices = DistinctColors.Count;
+            double[,] graph = new double[Vertices, Vertices];
+            for (int i = 0; i < Vertices; i++)
+            {
+                for (int j = 0; j < Vertices; j++)
+                {
+                    graph[i, j] = GetDistance(DistinctColors[i], DistinctColors[j]);
+                }
+            }
+            return graph;
+        }
+
+        public Double MST()
+        {
+            Vertices = DistinctColors.Count;
+            Double[,] Graph = Build_Graph();
+            NumOfEdges = Graph.Length;
+            int index = 0;
+            Graph graph = new Graph(Vertices, NumOfEdges);
+            for (int i = 0; i < Vertices; i++)
+            {
+                for (int j = 0; j < Vertices; j++)
+                {
+                    if (index < NumOfEdges)
+                    {
+                        graph.Edges[index].Source = i;
+                        graph.Edges[index].Destination = j;
+                        graph.Edges[index].Weight = Graph[i, j];
+                        index++;
+                    }
+                }
+            }
+
+            return graph.Kruskal_MST();
+
+        }
         /// <summary>
         /// Get the height of the image 
         /// </summary>
         /// <param name="ImageMatrix">2D array that contains the image</param>
         /// <returns>Image Height</returns>
+
         public static int GetHeight(RGBPixel[,] ImageMatrix)
         {
             return ImageMatrix.GetLength(0);
@@ -152,13 +229,13 @@ namespace ImageQuantization
         }
 
 
-       /// <summary>
-       /// Apply Gaussian smoothing filter to enhance the edge detection 
-       /// </summary>
-       /// <param name="ImageMatrix">Colored image matrix</param>
-       /// <param name="filterSize">Gaussian mask size</param>
-       /// <param name="sigma">Gaussian sigma</param>
-       /// <returns>smoothed color image</returns>
+        /// <summary>
+        /// Apply Gaussian smoothing filter to enhance the edge detection 
+        /// </summary>
+        /// <param name="ImageMatrix">Colored image matrix</param>
+        /// <param name="filterSize">Gaussian mask size</param>
+        /// <param name="sigma">Gaussian sigma</param>
+        /// <returns>smoothed color image</returns>
         public static RGBPixel[,] GaussianFilter1D(RGBPixel[,] ImageMatrix, int filterSize, double sigma)
         {
             int Height = GetHeight(ImageMatrix);
@@ -167,7 +244,7 @@ namespace ImageQuantization
             RGBPixelD[,] VerFiltered = new RGBPixelD[Height, Width];
             RGBPixel[,] Filtered = new RGBPixel[Height, Width];
 
-           
+
             // Create Filter in Spatial Domain:
             //=================================
             //make the filter ODD size
