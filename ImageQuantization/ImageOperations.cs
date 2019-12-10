@@ -179,7 +179,7 @@ namespace ImageQuantization
 
             return weights;
         }
-        
+        //////////
         /// <summary>
         /// Get the height of the image 
         /// </summary>
