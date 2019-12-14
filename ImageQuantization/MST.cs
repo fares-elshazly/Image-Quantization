@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using static ImageQuantization.Graph;
 
 namespace ImageQuantization
@@ -74,13 +75,41 @@ namespace ImageQuantization
                     NewEdges[NumOfEdges++] = NextEdge;
                     Union(SubSets, x, y);
                 }
-
             }
 
             for (int i = 0; i < NumOfEdges; ++i)
                 Result += NewEdges[i].Weight;
 
             return Result;
+        }
+
+        public static double PrimMST(List<List<Edge>> AdjacencyList, int NumOfVertices)
+        {
+            double MSTSum = 0;
+            bool[] Visited = new bool[NumOfVertices];
+            List<Edge> Edges = new List<Edge>();
+            PriorityQueue PQ = new PriorityQueue();
+
+            PQ.Enqueue(new Edge(-1, 0, 0));
+
+            while(PQ.Count > 0)
+            {
+                Edge e = PQ.Dequeue();
+                if (Visited[e.Destination])
+                    continue;
+                Visited[e.Destination] = true;
+                MSTSum += e.Weight;
+                if (e.Destination != 0)
+                    Edges.Add(e);
+                for(int i = 0; i < AdjacencyList[e.Destination].Count; i++)
+                {
+                    Edge ne = AdjacencyList[e.Destination][i];
+                    if (!Visited[ne.Destination])
+                        PQ.Enqueue(ne);
+                }
+            }
+
+            return MSTSum;
         }
     }
 }

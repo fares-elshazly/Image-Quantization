@@ -55,6 +55,7 @@
     <Compile Include="ImageOperations.cs" />
     <Compile Include="MathUtilities.cs" />
     <Compile Include="MST.cs" />
+    <Compile Include="PriorityQueue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">

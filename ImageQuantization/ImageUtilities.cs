@@ -1,23 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace ImageQuantization
 {
     public class ImageUtilities
     {
-        public static List<RGBPixel> FindDistinctColors(string imagePath)
+        public static unsafe int FindDistinctColours(string imagePath)
         {
-            RGBPixel[,] Colors = ImageOperations.OpenImage(imagePath);
-            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
+            Bitmap bmp = new Bitmap(imagePath);
+            int width = bmp.Width;
+            int height = bmp.Height;
 
-            for (int i = 0; i < Colors.GetLength(0); i++)
+            var rect = new Rectangle(0, 0, width, height);
+            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+            var colors = new HashSet<int>();
+
+            var bmpPtr = (int*)bmpData.Scan0;
+
+            for (int i = 0; i < width * height; i++)
             {
-                for (int j = 0; j < Colors.GetLength(1); j++)
-                {
-                    Distincit_Colors.Add(Colors[i, j]);
-                }
+                colors.Add(bmpPtr[0]);
+                bmpPtr++;
             }
-
-            return new List<RGBPixel>(Distincit_Colors);
+            bmp.UnlockBits(bmpData);
+            return colors.Count;
         }
     }
 }
