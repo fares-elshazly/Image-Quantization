@@ -32,10 +32,7 @@ namespace ImageQuantization
     /// </summary>
     public class ImageOperations
     {
-        public List<RGBPixel> DistinctColors = new List<RGBPixel>();
-        public Double[,] Clusters_Graph;
-        public int Vertices;
-        public int NumOfEdges;
+       
 
         /// <summary>
         /// Open an image and load it into 2D array of colors (size: Height x Width)
@@ -101,43 +98,7 @@ namespace ImageQuantization
             return Buffer;
         }
 
-        //public double[,] Build_Graph()
-        //{
-        //    Vertices = DistinctColors.Count;
-        //    double[,] graph = new double[Vertices, Vertices];
-        //    for (int i = 0; i < Vertices; i++)
-        //    {
-        //        for (int j = 0; j < Vertices; j++)
-        //        {
-        //            graph[i, j] = GetDistance(DistinctColors[i], DistinctColors[j]);
-        //        }
-        //    }
-        //    return graph;
-        //}
-
-        //public Double MST()
-        //{
-        //    Vertices = DistinctColors.Count;
-        //    Double[,] Graph = Build_Graph();
-        //    NumOfEdges = Graph.Length;
-        //    int index = 0;
-        //    Graph graph = new Graph(Vertices, NumOfEdges);
-        //    for (int i = 0; i < Vertices; i++)
-        //    {
-        //        for (int j = 0; j < Vertices; j++)
-        //        {
-        //            if (index < NumOfEdges)
-        //            {
-        //                graph.Edges[index].Source = i;
-        //                graph.Edges[index].Destination = j;
-        //                graph.Edges[index].Weight = Graph[i, j];
-        //                index++;
-        //            }
-        //        }
-        //    }
-
-        //    return graph.Kruskal_MST();
-
+        
         //}
         /// <summary>
         /// Get the height of the image 
