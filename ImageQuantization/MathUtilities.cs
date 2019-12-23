@@ -19,10 +19,13 @@ namespace ImageQuantization
                 return Base * Result * Result;
         }
 
-        public static double GetDistance(RGBPixel Cluster1, RGBPixel Cluster2)
+        public static double GetDistance(int i, int j)
         {
-            double Result = FastPower(Cluster1.red - Cluster2.red, 2) + FastPower(Cluster1.green - Cluster2.green, 2) + FastPower(Cluster1.blue - Cluster2.blue, 2);
-            return Math.Sqrt(Result);
+            RGBPixel Cluster1 = ImageUtilities.DistinctColours[i];
+            RGBPixel Cluster2 = ImageUtilities.DistinctColours[j];
+            double Result = (double)Math.Sqrt((Cluster1.red - Cluster2.red) * (Cluster1.red - Cluster2.red) + (Cluster1.green - Cluster2.green) * (Cluster1.green - Cluster2.green) + (Cluster1.blue - Cluster2.blue) * (Cluster1.blue - Cluster2.blue));
+            return Result;
+
         }
 
         public static double RoundUp(double Input, int Places)
