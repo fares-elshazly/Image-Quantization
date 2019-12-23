@@ -44,8 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Graph.cs" />
+    <Compile Include="EagerPrimMST.cs" />
     <Compile Include="ImageUtilities.cs" />
+    <Compile Include="IPriorityQueue.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -54,7 +55,6 @@
     </Compile>
     <Compile Include="ImageOperations.cs" />
     <Compile Include="MathUtilities.cs" />
-    <Compile Include="MST.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
