@@ -15,9 +15,11 @@ namespace ImageQuantization
             InitializeComponent();
         }
 
+        int K;
         RGBPixel[,] ImageMatrix;
         int Distinct_Colors;
         EagerPrimMST MST;
+        Edge[] edges;
         private void btnOpen_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -33,12 +35,11 @@ namespace ImageQuantization
                 Distinct_Colors = ImageUtilities.GetDistinctColors(ImageMatrix);
                 MST = new EagerPrimMST(Distinct_Colors);
                 double MST_SUM = MST.GetMst();
-
+                edges = MST.Edge_To;
                 txtDistinctColours.Text = Distinct_Colors.ToString();
                 txtMSTSum.Text = MathUtilities.RoundUp(MST_SUM, 1).ToString();
                 long timeAfter = Environment.TickCount;
 
-               
                 txtTime.Text = (timeAfter - timeBefore).ToString();
             }
             txtWidth.Text = ImageOperations.GetWidth(ImageMatrix).ToString();
@@ -49,12 +50,38 @@ namespace ImageQuantization
         private void btnGaussSmooth_Click(object sender, EventArgs e)
         {
             double sigma = double.Parse(txtGaussSigma.Text);
-            int maskSize = (int)nudMaskSize.Value ;
-            ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
-            ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
+            int maskSize = (int)nudMaskSize.Value;
+           
+            if (K_Clusters.Text.ToString().Length > 0)
+            {
+
+                K = int.Parse(K_Clusters.Text);
+                KClustring Clusters = new KClustring(K, MST.Nodes, MST.Edge_To);
+                Clusters.Clustering();
+                Clusters.ColorsOfEachCluster();
+                Clusters.QuantizeImage(Clusters.Palette, ImageMatrix);
+                //ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
+                ImageOperations.DisplayImage(Clusters.Quantized_Image, pictureBox2);
+
+            }
+            else
+            {
+                MathUtilities m = new MathUtilities();
+                K = m.AutoKdetection(edges);
+                K = m.K;
+                MessageBox.Show(K.ToString());
+                KClustring Clusters = new KClustring(K, MST.Nodes, MST.Edge_To);
+                Clusters.Clustering();
+                Clusters.ColorsOfEachCluster();
+                Clusters.QuantizeImage(Clusters.Palette, ImageMatrix);
+                //ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
+                ImageOperations.DisplayImage(Clusters.Quantized_Image, pictureBox2);
+
+            }
+
         }
 
-       
-       
+
+
     }
 }
