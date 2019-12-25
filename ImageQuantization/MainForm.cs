@@ -58,6 +58,7 @@ namespace ImageQuantization
                 K = int.Parse(K_Clusters.Text);
                 KClustring Clusters = new KClustring(K, MST.Nodes, MST.Edge_To);
                 Clusters.Clustering();
+                Clusters.ColorsOfEachCluster();
                 Clusters.QuantizeImage(Clusters.Palette, ImageMatrix);
                 //ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
                 ImageOperations.DisplayImage(Clusters.Quantized_Image, pictureBox2);
@@ -71,6 +72,7 @@ namespace ImageQuantization
                 MessageBox.Show(K.ToString());
                 KClustring Clusters = new KClustring(K, MST.Nodes, MST.Edge_To);
                 Clusters.Clustering();
+                Clusters.ColorsOfEachCluster();
                 Clusters.QuantizeImage(Clusters.Palette, ImageMatrix);
                 //ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
                 ImageOperations.DisplayImage(Clusters.Quantized_Image, pictureBox2);

@@ -73,8 +73,11 @@ namespace ImageQuantization
                 }
 
             }
-            for (int c = 0; c < NewColors.Count; c++)
-            {
+            
+        }
+        public void ColorsOfEachCluster()
+        {
+          
                 Palette = new List<RGBPixel>();
                 RGBPixel color = new RGBPixel();
                 for (int i = 0; i < NewColors.Count; i++)
@@ -99,7 +102,8 @@ namespace ImageQuantization
                     color.green = (byte)green;
                     Palette.Add(color);
                 }
-            }
+            
+
 
         }
 
