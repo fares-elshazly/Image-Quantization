@@ -4,20 +4,27 @@ namespace ImageQuantization
 {
     public class ImageUtilities
     {
-        public static List<RGBPixel> FindDistinctColors(string imagePath)
+        public static List<RGBPixel> DistinctColours;
+       
+        public static int GetDistinctColors(RGBPixel[,] Buffer)
         {
-            RGBPixel[,] Colors = ImageOperations.OpenImage(imagePath);
-            HashSet<RGBPixel> Distincit_Colors = new HashSet<RGBPixel>();
+            bool[,,] Visited_Buffer = new bool[256, 256, 256];
 
-            for (int i = 0; i < Colors.GetLength(0); i++)
+            DistinctColours = new List<RGBPixel>();
+
+            for (int i = 0; i < Buffer.GetLength(0); i++)
             {
-                for (int j = 0; j < Colors.GetLength(1); j++)
+                for (int j = 0; j < Buffer.GetLength(1); j++)
                 {
-                    Distincit_Colors.Add(Colors[i, j]);
+
+                    if (Visited_Buffer[Buffer[i, j].red, Buffer[i, j].green, Buffer[i, j].blue] == false)
+                    {
+                        Visited_Buffer[Buffer[i, j].red, Buffer[i, j].green, Buffer[i, j].blue] = true;
+                        DistinctColours.Add(Buffer[i, j]);
+                    }
                 }
             }
-
-            return new List<RGBPixel>(Distincit_Colors);
+            return DistinctColours.Count;
         }
     }
 }
