@@ -17,6 +17,7 @@ namespace ImageQuantization
 
         RGBPixel[,] ImageMatrix;
         int Distinct_Colors;
+        EagerPrimMST MST;
         private void btnOpen_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -30,8 +31,11 @@ namespace ImageQuantization
                 long timeBefore = Environment.TickCount;
 
                 Distinct_Colors = ImageUtilities.GetDistinctColors(ImageMatrix);
-                txtDistinctColours.Text = Distinct_Colors.ToString();
+                MST = new EagerPrimMST(Distinct_Colors);
+                double MST_SUM = MST.GetMst();
 
+                txtDistinctColours.Text = Distinct_Colors.ToString();
+                txtMSTSum.Text = MathUtilities.RoundUp(MST_SUM, 1).ToString();
                 long timeAfter = Environment.TickCount;
 
                
