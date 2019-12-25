@@ -8,7 +8,7 @@ namespace ImageQuantization
     {
         static double Eps = .00000001;
         public static double mean { set; get; }
-        public static double stdDev { set; get; }
+        public static double StdDev { set; get; }
         public double prevStdDev = 0;
         public double WeightLeadToMax = 0;
         public int K = 0;
@@ -64,8 +64,8 @@ namespace ImageQuantization
                 sum += ((edge.Weight - mean) * (edge.Weight - mean));
             }
             WeightLeadToMax = 0;
-            stdDev = sum / (currentEdges.Count() - 1);
-            stdDev = Math.Sqrt(stdDev);
+            StdDev = sum / (currentEdges.Count() - 1);
+            StdDev = Math.Sqrt(StdDev);
         }
         public int AutoKdetection(Edge[] edges)
         {
@@ -73,10 +73,10 @@ namespace ImageQuantization
             K = 0;
             CalculateMean();
             CalcuateStdDev();
-            while (Math.Abs(stdDev - prevStdDev) > .0001)
+            while (Math.Abs(StdDev - prevStdDev) > .0001)
             {
                 currentEdges.Remove(edgeLeadToMax);
-                prevStdDev = stdDev;
+                prevStdDev = StdDev;
                 CalculateMean();
                 CalcuateStdDev();
                 ++K;
