@@ -31,10 +31,14 @@ namespace ImageQuantization
         public bool[] Visited;
         public IPriorityQueue IndexedPQ;
         public int NumOfVertices;
+        public int minimumindex = 0;
+        public int[] Nodes;
 
         public EagerPrimMST(int GraphNodesCount)
         {
+
             NumOfVertices = GraphNodesCount;
+            Nodes = new int[ImageUtilities.DistinctColours.Count];
             Edge_To = new Edge[NumOfVertices];
             Destination = new double[NumOfVertices];
             Visited = new bool[NumOfVertices];
@@ -52,7 +56,9 @@ namespace ImageQuantization
             while (!IndexedPQ.IsEmpty())
             {
                 int j = IndexedPQ.DeleteMin();
+                minimumindex = j;
                 Visited[j] = true;
+
                 for (int v = 0; v < NumOfVertices; ++v)
                 {
                     if (Visited[v]) continue;
@@ -60,6 +66,7 @@ namespace ImageQuantization
                     if (edgeWeight < Destination[v])
                     {
                         Destination[v] = edgeWeight;
+                        Nodes[v] = minimumindex;
                         Edge_To[v] = new Edge(edgeWeight, j, v);
                         if (IndexedPQ.Contains(v))
                         {
@@ -76,6 +83,7 @@ namespace ImageQuantization
             }
             return Sum;
         }
+
 
 
 

@@ -67,5 +67,21 @@ namespace ImageQuantization
             stdDev = sum / (currentEdges.Count() - 1);
             stdDev = Math.Sqrt(stdDev);
         }
+        public int AutoKdetection(Edge[] edges)
+        {
+            currentEdges = edges.ToList();
+            K = 0;
+            CalculateMean();
+            CalcuateStdDev();
+            while (Math.Abs(stdDev - prevStdDev) > .0001)
+            {
+                currentEdges.Remove(edgeLeadToMax);
+                prevStdDev = stdDev;
+                CalculateMean();
+                CalcuateStdDev();
+                ++K;
+            }
+            return K;
+        }
     }
 }
